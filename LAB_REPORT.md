@@ -33,22 +33,44 @@ State in one sentence where you think the parcels of the first run were kept.
 ParcelRepository repository = new InMemoryParcelRepository();
 ```
 
-0.6 Commit of the switch to H2:
+0.6 Commit of the switch to H2: 9aac687
 
 0.7 Output of `SELECT * FROM PARCEL;` after you stored two parcels:
 
 ```text
-
+sql> SELECT * FROM PARCEL;
+CODE  | STUDENT_ID | PARCEL_SIZE | STATUS | LOCKER_NUMBER
+P1001 | S1001      | SMALL       | STORED | 1
+P1002 | S1002      | LARGE       | STORED | 3
+(2 rows, 88 ms)
 ```
 
 0.8 Explain why ParcelPoint could not start while the H2 Shell was open, and identify the class that wrote the message `Cannot create the PARCEL table`.
+ParcelPoint could not start because H2 is an embedded database: the H2 Shell had already opened data/parcelpoint, so H2 locked the file parcelpoint.mv.db and a second program could not open it at the same time. The message "Cannot create the PARCEL table" was written by the constructor of H2ParcelRepository, which caught the SQLException from H2 and threw an IllegalStateException with that message.
 
 0.9 Explain why `staff` shows no parcel while `find` shows each one, and why all three lockers look free.
+`find` uses findByCode, which really reads the PARCEL table, so it finds each parcel. `staff` uses findAll, which is not written yet and only returns an empty list (List.of()), so it shows no parcel. When the program starts, the constructor of ParcelService calls findAll to put the waiting parcels back into their lockers; because the list is empty, no locker gets a parcel, so all three lockers look free.
 
 0.11 Your findAll method:
 
 ```java
-
+ @Override
+    public List<Parcel> findAll() {
+        // TODO Step 0.11: read every row of the PARCEL table as findByCode does,
+        // TODO turn each row into a Parcel with toParcel, and return the list.
+        String sql = "SELECT * FROM PARCEL ORDER BY CODE";
+        List<Parcel> parcels = new ArrayList<>();
+        try (Connection connection = connect();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet row = statement.executeQuery()) {
+            while (row.next()) {
+                parcels.add(toParcel(row));
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Cannot read the parcels", e);
+        }
+        return parcels;
+    }
 ```
 
 Commit that adds findAll:
