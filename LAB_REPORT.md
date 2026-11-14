@@ -27,6 +27,8 @@ Free lockers: 3
 
 State in one sentence where you think the parcels of the first run were kept.
 
+The parcels were kept only in the memory of the running program, in a Map inside InMemoryParcelRepository, so they disappeared when the program ended.
+
 0.5 The line of Main that you would change to keep the parcels somewhere else:
 
 ```java
@@ -87,9 +89,8 @@ P1002 | S1002      | LARGE       | STORED    | 3
 (2 rows, 26 ms)
 ```
 
-0.13 Optional. Describe what `find P9999'OR'1'='1` showed 
+0.13 Optional. Describe what `find P9999'OR'1'='1` showed while the SQL was joined from strings, and what it showed after you put the placeholder back.
 
-while the SQL was joined from strings, and what it showed after you put the placeholder back.
 While the SQL was joined from strings, `find P9999'OR'1'='1` showed parcel P1001 (P1001, S1001, SMALL, PICKED_UP), although no parcel has that code. The quotes I typed closed the text in the SQL and added the condition '1'='1', which is true for every row, so H2 returned all rows and findByCode showed the first one. This is SQL injection. After I put the placeholder ? and statement.setString(1, code) back, the same input showed "No parcel with code P9999'OR'1'='1", because H2 compared CODE with the whole text I typed.
 
 ## Part A. Model the design
@@ -190,7 +191,7 @@ H2 runs inside the program as a library and stores data in a file, so no separat
 
 4. State the data store that you would choose for your Project Phase 2 team, files or an embedded database, the requirement that drives the choice, and the package that will access it.
 
-We would choose an embedded database, H2, because [our system needs to search and update records by key]. The package storage will access it.
+We would choose an embedded database, H2, because our system must keep its records after the program ends and search them by key, which SQL handles more simply than reading and rewriting a file. The package storage will access it.
 
 ## AI usage declaration
 
@@ -199,4 +200,3 @@ We would choose an embedded database, H2, because [our system needs to search an
 | Claude Opus 5.5 (Anthropic) | 14 Nov 2026 | Explain commands, code and errors | Helped write findAll and phrase my answers in Part 0 | Built and ran the program; outputs matched the lab sheet |
 | Claude Opus 5.5 (Anthropic) | 14 Nov 2026 | Draft diagrams | A1, A2, A3 | Checked A1 against the imports; rendered all on mermaid.live |
 | Claude Opus 5.5 (Anthropic) | 14 Nov 2026 | Draft Part B | Answers 1–3 | Shortened and edited the answers |
-| | | | | |
