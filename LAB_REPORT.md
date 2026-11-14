@@ -73,15 +73,20 @@ ParcelPoint could not start because H2 is an embedded database: the H2 Shell had
     }
 ```
 
-Commit that adds findAll:
+Commit that adds findAll: c4a6477
 
 0.12 Output of `SELECT * FROM PARCEL;` after the pickup:
 
 ```text
-
+sql> SELECT * FROM PARCEL;
+CODE  | STUDENT_ID | PARCEL_SIZE | STATUS    | LOCKER_NUMBER
+P1001 | S1001      | SMALL       | PICKED_UP | null
+P1002 | S1002      | LARGE       | STORED    | 3
+(2 rows, 26 ms)
 ```
 
 0.13 Optional. Describe what `find P9999'OR'1'='1` showed while the SQL was joined from strings, and what it showed after you put the placeholder back.
+While the SQL was joined from strings, `find P9999'OR'1'='1` showed parcel P1001 (P1001, S1001, SMALL, PICKED_UP), although no parcel has that code. The quotes I typed closed the text in the SQL and added the condition '1'='1', which is true for every row, so H2 returned all rows and findByCode showed the first one. This is SQL injection. After I put the placeholder ? and statement.setString(1, code) back, the same input showed "No parcel with code P9999'OR'1'='1", because H2 compared CODE with the whole text I typed.
 
 ## Part A. Model the design
 
