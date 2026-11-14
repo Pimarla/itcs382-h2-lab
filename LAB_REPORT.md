@@ -1,6 +1,6 @@
 # Lab Report, Designing the Data Management Layer with H2
 
-Repository URL:
+Repository URL: https://github.com/Pimarla/itcs382-h2-lab
 
 ## Tools
 
